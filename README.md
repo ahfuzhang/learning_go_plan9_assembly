@@ -14,6 +14,7 @@ Collect various materials in the process of learning go plan9 assembly and share
 * Arguments and return values: [examples/arg_and_ret/](examples/arg_and_ret/)
 * Use golang global variable: [examples/global_variable/](examples/global_variable/)
 * Local variables and push/pop stack: [examples/push_pop_stack/](examples/push_pop_stack/)
+* Call go func: [examples/call_go_func/](examples/call_go_func/)
 
 # Notes
 (Chinese)
