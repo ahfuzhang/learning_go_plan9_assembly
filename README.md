@@ -9,6 +9,12 @@ Collect various materials in the process of learning go plan9 assembly and share
   - [Intel-Intrinsics-Guide-Offline-3.6.6](downloads/Intel-Intrinsics-Guide-Offline-3.6.6.zip)
   - [x86 intrinsics cheat sheet v1.0](downloads/x86%20intrinsics%20cheat%20sheet%20v1.0.pdf)
 
+# Examples
+* test all registers: [examples/allregisters/](examples/allregisters/)
+* Arguments and return values: [examples/arg_and_ret/](examples/arg_and_ret/)
+* Use golang global variable: [examples/global_variable/](examples/global_variable/)
+* Local variables and push/pop stack: [examples/push_pop_stack/](examples/push_pop_stack/)
+
 # Notes
 (Chinese)
 * [Go plan9 汇编笔记](notes/Go%20plan9%20汇编笔记.md)
@@ -26,7 +32,7 @@ Collect various materials in the process of learning go plan9 assembly and share
   - 包括：
     - https://github.com/chenzhuoyu/asm2asm  (python 3.8)
     - https://github.com/minio/c2goasm + https://github.com/minio/asm2plan9s
-  - 某些简单的代码能够翻译过来，但是一旦包含 avx 指令就不行了  
+  - 某些简单的代码能够翻译过来，但是一旦包含 avx 指令就不行了
 * 某些库可以用 golang 的语法来写汇编，然后以 jit 的方式编译为函数：
   - https://github.com/modern-go/amd64
   - 这个思路非常不错。但我需要会写汇编之后，才能用好这个库

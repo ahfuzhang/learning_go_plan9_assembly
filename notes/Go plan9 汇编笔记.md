@@ -1396,6 +1396,9 @@ Fast (but unsafe) Cgo calls via an assembly trampoline. Inspired by rustgo. The 
 * [Go Assembly Overview](https://www.sobyte.net/post/2022-08/go-assembly/)
 * [A Manual for the Plan 9 assembler(pdf)](https://usermanual.wiki/Document/A20Manual20for20the20Plan20920assembler.333142479/view)
 * [Go assembly language complementary reference](https://quasilyte.dev/blog/post/go-asm-complementary-reference/)
+* [译:go 和 plan9 汇编](https://xargin.com/go-and-plan9-asm/)
+  * https://github.com/teh-cmc/go-internals
+
 
 
 

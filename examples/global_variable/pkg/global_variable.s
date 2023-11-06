@@ -25,3 +25,15 @@ TEXT ·GetAddress(SB), NOSPLIT | RODATA | NOPTR | NOFRAME, $0-8
     LEAQ ·globalVariableExample(SB),R8
     MOVQ R8,ret+0(FP)
     RET
+
+/*
+// 汇编中无法引用 golang 中的常量
+TEXT ·GetConst(SB), NOSPLIT | RODATA | NOPTR | NOFRAME, $0-8
+    // 栈帧长度  0
+    // 参数 0 字节
+    //  返回值  8 字节
+    //
+    MOVQ $$(valueOfXX), R8
+    MOVQ R8,ret+0(FP)
+    RET
+*/
