@@ -13,6 +13,7 @@ Collect various materials in the process of learning go plan9 assembly and share
 * test all registers: [examples/allregisters/](examples/allregisters/)
 * Arguments and return values: [examples/arg_and_ret/](examples/arg_and_ret/)
 * Use golang global variable: [examples/global_variable/](examples/global_variable/)
+  - plan9 global variable and static data: [examples/static_data/](examples/static_data/)
 * Local variables and push/pop stack: [examples/push_pop_stack/](examples/push_pop_stack/)
 * Call go func: [examples/call_go_func/](examples/call_go_func/)
 
