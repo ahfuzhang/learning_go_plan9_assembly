@@ -435,6 +435,11 @@ Y0~Y15
     VMOVDQU _m256i(SB), Y0
 ```
 
+* 注意： Y 系列寄存器的低 128bit 就是 X 系列寄存器
+
+* 读取高  128bit 的数据，可以使用指令 vextracti128
+  * __m128i _mm256_extracti128_si256 (__m256i a, const int imm8)
+
 
 
 ##  2.4 512 bit AVX512 寄存器
