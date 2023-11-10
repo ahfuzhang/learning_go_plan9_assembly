@@ -3,49 +3,16 @@
 
 本例子中通过这个简单的算法来展示汇编优化的过程。
 
-性能比较：(mb/s)
-test data len:67111218
-golang.CaesarCrypt                         733.7099
-golang.CaesarCryptBySearchTable           1447.5561
-fastcgo.CaesarCryptByFastCgo               414.3023
-fastcgo.CaesarCryptByFastCgoAvx2           286.3520
-fastcgo.CaesarCryptByFastCgoAvx512        1779.3724
-plan9asm.CaesarCryptAsm                   1617.1576
-plan9asm.CaesarCryptAsmAvx2               1447.2942
+各个实现方法的性能比较：(单位 mb/s， 越大越好)
 
-O3 优化版本:
-golang.CaesarCrypt                         940.0897  7
-golang.CaesarCryptBySearchTable           1627.6861  4
-fastcgo.CaesarCryptByFastCgo              2857.1155  3
-fastcgo.CaesarCryptByFastCgoAvx2          3795.6497  1
-fastcgo.CaesarCryptByFastCgoAvx512        3090.8507  2
-plan9asm.CaesarCryptAsm                   1623.1454  5 =>
-plan9asm.CaesarCryptAsmAvx2               1443.8659  6
+* cpu 类型：Intel(R) Xeon(R) Platinum 8369B CPU @ 2.70GHz
 
-O3 优化版本: 减少了指令
-fastcgo.CaesarCryptByFastCgoAvx512        1593.0467 5
-plan9asm.CaesarCryptAsm                   2038.0284 3
-plan9asm.CaesarCryptAsmAvx2               1433.8063 6
-golang.CaesarCrypt                         923.4867 7
-golang.CaesarCryptBySearchTable           1617.1576 4
-fastcgo.CaesarCryptByFastCgo              2917.1488 2
-fastcgo.CaesarCryptByFastCgoAvx2          3810.5647 1
-
-O3, 再减少一条指令
-golang.CaesarCrypt                         735.9625 7
-golang.CaesarCryptBySearchTable           1621.8292 5
-fastcgo.CaesarCryptByFastCgo              2873.2770 3
-fastcgo.CaesarCryptByFastCgoAvx2          3782.4150 1
-fastcgo.CaesarCryptByFastCgoAvx512        3080.2890 2
-plan9asm.CaesarCryptAsm                   2586.4718 4
-plan9asm.CaesarCryptAsmAvx2               1446.4111 6
-
-// 循环展开
-test data len:67111218
-golang.CaesarCryptBySearchTable           1101.8911 6
-fastcgo.CaesarCryptByFastCgo              2906.5506 4
-fastcgo.CaesarCryptByFastCgoAvx2          3782.1915 1
-fastcgo.CaesarCryptByFastCgoAvx512        3081.1787 2
-plan9asm.CaesarCryptAsm                   2952.8141 3
-plan9asm.CaesarCryptAsmAvx2               1446.5746 5
-golang.CaesarCrypt                         941.3756 7
+| 名称 | 说明 | 性能(mb/s) |
+| ---- | ---- | ---- |
+| plan9asm.CaesarCryptAsm | go plan9 汇编实现 | 2976.7102 |
+| fastcgo.CaesarCryptByFastCgo | c 实现，使用 fastcgo 调用，O3 编译优化 | 2931.4453 |
+| fastcgo.CaesarCryptByFastCgoAvx512 | c 实现，使用 avx512 指令集 | 1725.3604 |
+| golang.CaesarCryptBySearchTable | golang 实现，使用查表的方法 | 1595.8272 |
+| fastcgo.CaesarCryptByFastCgoAvx2 | c 实现，使用 avx2 指令集<br/> **注意**: 编译器可能把某些只支持 avx2 的某些函数编译成 avx512 的指令 | 805.2319 |
+| golang.CaesarCrypt | golang 实现， 未使用查表的方法 | 735.1510 |
+| plan9asm.CaesarCryptAsmAvx2 | go plan9 汇编实现，使用  avx2 指令集<br/>(因为优化的意义不大，这里未深入优化) | 650.8129 |

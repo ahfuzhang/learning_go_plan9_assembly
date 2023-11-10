@@ -16,6 +16,9 @@ Collect various materials in the process of learning go plan9 assembly and share
   - plan9 global variable and static data: [examples/static_data/](examples/static_data/)
 * Local variables and push/pop stack: [examples/push_pop_stack/](examples/push_pop_stack/)
 * Call go func: [examples/call_go_func/](examples/call_go_func/)
+* Caesar Crypt: [examples/caesar_crypt/](examples/caesar_crypt/)
+  - go plan9 assembly version: [examples/caesar_crypt/caesar/plan9asm/caesar_plain.s](examples/caesar_crypt/caesar/plan9asm/caesar_plain.s)
+  - go plan9 assembly + avx2 version: [examples/caesar_crypt/caesar/plan9asm/caesar_avx2.s](examples/caesar_crypt/caesar/plan9asm/caesar_avx2.s)
 
 # Notes
 (Chinese)

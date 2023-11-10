@@ -9,7 +9,6 @@ TEXT ·CaesarCryptAsm(SB), NOSPLIT | NOFRAME, $0-56
     MOVQ rot+48(FP), R11
     // 获取查表的位置
 	MOVQ ·table(SB), R12
-    //
     SHLQ $10, R11  // 左移 10 位
     LEAQ (R12)(R11*1), R12  // 查表的开始位置
     //
@@ -53,8 +52,6 @@ align8:
 		MOVBQZX (R12)(R13*4), R13;
         MOVB R13, 7(R10)(AX*1);
 
-		//INCQ R8  // in++
-        //INCQ R10;  // out++
 		ADDQ $8, AX  // index += 8
     // 循环体结束
     JMP  align8
@@ -68,12 +65,8 @@ start:
     JE done
     // 循环体
         MOVBQZX (R8)(AX*1), R13   // R13 = *in
-        //LEAQ (R12)(R13*4), R11;  // 相比 c 的版本，多了这条指令
-        //MOVBQZX (R11), R13;
 		MOVBQZX (R12)(R13*4), R13;
         MOVB R13, (R10)(AX*1);
-		//INCQ R8  // in++
-        //INCQ R10;  // out++
 		INCQ AX  // index++
     // 循环体结束
     JMP  start

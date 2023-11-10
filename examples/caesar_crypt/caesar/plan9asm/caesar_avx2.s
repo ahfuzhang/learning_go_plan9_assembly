@@ -22,70 +22,115 @@ TEXT ·CaesarCryptAsmAvx2(SB), NOSPLIT | NOFRAME, $0-56
 	MOVQ ·table(SB), R12
     SHLQ $10, R11  // 左移 10 位, 乘以 256 * 4 字节
     LEAQ (R12)(R11*1), R12  // 查表的开始位置
-       // R11 不再使用
     // 每次处理  16  字节
     MOVQ R9, R13  // 备份  len
     ANDQ $0x0f, R13  // 取模 16  // tailLen = len & 0x0f
+	MOVQ R13, R15  // r15 = tailLen
     LEAQ (R8)(R9*1), R14  // end = in + len
-    MOVQ R14, R9  // R9 = real_end
+    //MOVQ R14, R9  // R9 = real_end
     SUBQ R13, R14  // end -= tailLen
     // 准备一个用来做掩码的寄存器
-    // VMOVDQU indexMask(SB),Y6
     VMOVDQA indexMask(SB),Y6  // 对齐加载
-    //VPXOR Y5, Y5, Y5
     VPXOR X5, X5, X5  // 低 128 bit 置  0  就够了
     VPCMPEQD Y7, Y7, Y7  // 全部为 1
-    //VPCMPEQD Y4, Y4, Y4  // 全部为 1
     // 开始  16 字节的处理
-start:
+align16:
     CMPQ R8, R14  // if cur==end
-    JE tail
+    JE align16_end
     // 循环体
         MOVOU (R8), X3  // 非对齐的加载 8 bit * 16 数据  // _mm_loadu_si128
         VPMOVZXBD X3, Y0  //  8 个 8bit, 变成 8 个  32 bit  // _mm256_cvtepu8_epi32
-        //VPCMPEQD Y4, Y4, Y4  // 全部为 1
-        VMOVDQA Y7, Y4  // 看下赋值会不会比比较指令更快
+        VMOVDQA Y7, Y4  // Y4 = Y7 = 0
         BYTE $0xc4; BYTE $0xc2; BYTE $0x5d; BYTE $0x90; BYTE $0x0c; BYTE $0x84;  // VPGATHERDD %ymm4, (%r12,%ymm0,4), %ymm1;
         // 处理后面 8 字节
-        //VPSRLDQ $8, X3, X3  // X0 >>= 64  // src = _mm_srli_si128(src, 8);
         MOVHLPS X3, X3
-        //
         VPMOVZXBD X3, Y0  // 8 个 8bit, 变成 8 个  32 bit  // _mm256_cvtepu8_epi32
-        //VPCMPEQD Y4, Y4, Y4  // 全部为 1, 神奇，计算完成后，这个寄存器全部变 0
-        VMOVDQA Y7, Y4  // 看下赋值会不会比比较指令更快
+        VMOVDQA Y7, Y4  // Y4 = Y7 = 0
         BYTE $0xc4; BYTE $0xc2; BYTE $0x5d; BYTE $0x90; BYTE $0x14; BYTE $0x84;  // VPGATHERDD %ymm4, (%r12,%ymm0,4), %ymm2;
         // 进行压缩
-        // __m256i found16 = _mm256_packus_epi32(foundHead, foundTail);  // 16 个  16 位的值
-        VPACKUSDW Y1, Y2, Y0  // Y1 = pack(Y1, Y2)
-        // found16 =  _mm256_permutevar8x32_epi32 (found16, index_mask)  // 交换位置
-        VPERMD Y0, Y6, Y3   // Y1 = change_index(Y1, Mask)
-        // found16 =  _mm256_packus_epi16(found16, _mm256_setzero_si256());
-        VPACKUSWB Y3, Y5, Y0
-        // found16 =  _mm256_permutevar8x32_epi32 (found16, index_mask);
-        VPERMD Y0, Y6, Y1   // Y1 = change_index(Y1, Mask)
-        // __m128i result = _mm256_castsi256_si128(found16);
-        // X1 = Y1
-        //_mm_storeu_si128 (out, result);
-        VMOVDQU X1, (R10)
+        VPACKUSDW Y1, Y2, Y0  // Y1 = pack(Y1, Y2)   _mm256_packus_epi32
+        VPERMD Y0, Y6, Y3   // Y1 = change_index(Y1, Mask)  // _mm256_permutevar8x32_epi32  // 交换位置
+        VPACKUSWB Y3, Y5, Y0  // _mm256_packus_epi16
+        VPERMD Y0, Y6, Y1   // Y1 = change_index(Y1, Mask)  // _mm256_permutevar8x32_epi32
+        VMOVDQU X1, (R10)   // _mm_storeu_si128
         ADDQ $16, R8  // start += 16
         ADDQ $16, R10  // out += 16
     // 循环体结束
-    JMP  start
+    JMP  align16
     // 下面开始处理剩下的字节数
-tail:
-    // cur = R8
-    // end = R9
-    // table = R12
-    CMPQ R8, R9  // if cur==end
+align16_end:
+
+#ifdef _ALIGN8
+	MOVQ R15, BX  // BX = tailLen
+	ANDQ $-8, BX  // 按照 8 字节对齐
+	XORQ AX, AX  // index = 0
+align8:
+    CMPQ AX, BX  // if index==len
+    JE align1
+    // 循环体
+	    // 展开 0
+        MOVBQZX (R8)(AX*1), R13   // R13 = *in
+		MOVBQZX (R12)(R13*4), R13;
+        MOVB R13, (R10)(AX*1);
+	    // 展开 1
+        MOVBQZX 1(R8)(AX*1), R13   // R13 = *in
+		MOVBQZX (R12)(R13*4), R13;
+        MOVB R13, 1(R10)(AX*1);
+	    // 展开 2
+        MOVBQZX 2(R8)(AX*1), R13   // R13 = *in
+		MOVBQZX (R12)(R13*4), R13;
+        MOVB R13, 2(R10)(AX*1);
+	    // 展开 3
+        MOVBQZX 3(R8)(AX*1), R13   // R13 = *in
+		MOVBQZX (R12)(R13*4), R13;
+        MOVB R13, 3(R10)(AX*1);
+	    // 展开 4
+        MOVBQZX 4(R8)(AX*1), R13   // R13 = *in
+		MOVBQZX (R12)(R13*4), R13;
+        MOVB R13, 4(R10)(AX*1);
+	    // 展开 5
+        MOVBQZX 5(R8)(AX*1), R13   // R13 = *in
+		MOVBQZX (R12)(R13*4), R13;
+        MOVB R13, 5(R10)(AX*1);
+	    // 展开 6
+        MOVBQZX 6(R8)(AX*1), R13   // R13 = *in
+		MOVBQZX (R12)(R13*4), R13;
+        MOVB R13, 6(R10)(AX*1);
+	    // 展开 7
+        MOVBQZX 7(R8)(AX*1), R13   // R13 = *in
+		MOVBQZX (R12)(R13*4), R13;
+        MOVB R13, 7(R10)(AX*1);
+
+		ADDQ $8, AX  // index += 8
+    // 循环体结束
+    JMP  align8
+align1:
+	//MOVQ R15, BX  // bx = tailLen
+	//SUBQ AX, BX   // bx -= ax
+start:
+    CMPQ AX, R15  // if index==len
     JE done
     // 循环体
-        MOVBQZX (R8), R13   // R13 = *in  // MOVB 也可以
-        INCQ R8  // in++
-        LEAQ (R12)(R13*4), R11;
-        MOVBQZX (R11), R13;
-        MOVB R13, (R10);
-        INCQ R10;
+        MOVBQZX (R8)(AX*1), R13   // R13 = *in
+		MOVBQZX (R12)(R13*4), R13;
+        MOVB R13, (R10)(AX*1);
+		INCQ AX  // index++
     // 循环体结束
-    JMP  tail
+    JMP  start
+#else
+
+	XORQ AX,AX
+start:
+    CMPQ AX, R15  // if index==len
+    JE done
+    // 循环体
+        MOVBQZX (R8)(AX*1), R13   // R13 = *in
+		MOVBQZX (R12)(R13*4), R13;
+        MOVB R13, (R10)(AX*1);
+		INCQ AX  // index++
+    // 循环体结束
+    JMP  start
+
+#endif
 done:
     RET

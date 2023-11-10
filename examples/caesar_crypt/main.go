@@ -18,13 +18,22 @@ const (
 type CaesarCryptFunc func(out []byte, in []byte, rotate int)
 
 var funcs = map[string]CaesarCryptFunc{
-	"golang.CaesarCrypt":                 golang.CaesarCrypt,
-	"golang.CaesarCryptBySearchTable":    golang.CaesarCryptBySearchTable,
-	"fastcgo.CaesarCryptByFastCgo":       fastcgo.CaesarCryptByFastCgo,
-	"fastcgo.CaesarCryptByFastCgoAvx2":   fastcgo.CaesarCryptByFastCgoAvx2,
+	"golang.CaesarCrypt":               golang.CaesarCrypt,
+	"golang.CaesarCryptBySearchTable":  golang.CaesarCryptBySearchTable,
+	"fastcgo.CaesarCryptByFastCgo":     fastcgo.CaesarCryptByFastCgo,
+	"fastcgo.CaesarCryptByFastCgoAvx2": fastcgo.CaesarCryptByFastCgoAvx2,
 	"fastcgo.CaesarCryptByFastCgoAvx512": fastcgo.CaesarCryptByFastCgoAvx512,
-	"plan9asm.CaesarCryptAsm":            plan9asm.CaesarCryptAsm,
-	"plan9asm.CaesarCryptAsmAvx2":        plan9asm.CaesarCryptAsmAvx2,
+	"plan9asm.CaesarCryptAsm":     plan9asm.CaesarCryptAsm,
+	"plan9asm.CaesarCryptAsmAvx2": plan9asm.CaesarCryptAsmAvx2,
+}
+
+func runAvx2() {
+	in := []byte(inStr)
+	rotate := 0
+	fmt.Printf("in :%s\n", inStr)
+	out := make([]byte, len(in))
+	funcs["plan9asm.CaesarCryptAsmAvx2"](out, in, rotate)
+	fmt.Printf("out:%s | \n", string(out))
 }
 
 func run() {
@@ -39,17 +48,21 @@ func run() {
 }
 
 func check() bool {
-	in := []byte(inStr)
-	for i := 0; i < 26; i++ {
-		std := make([]byte, len(in))
-		funcs["golang.CaesarCrypt"](std, in, i)
-		for name, f := range funcs {
-			out := make([]byte, len(in))
-			f(out, in, i)
-			if !bytes.Equal(std, out) {
-				fmt.Printf("\nout :%s | %s\n", string(out), name)
-				fmt.Printf("need:%s | rot=%d\n", string(std), i)
-				return false
+	raw := []byte(inStr)
+	for j := 0; j < 16; j++ {
+		in := raw[j:]
+		fmt.Printf("in:  %s\n", string(in))
+		for i := 0; i < 26; i++ {
+			std := make([]byte, len(in))
+			funcs["golang.CaesarCrypt"](std, in, i)
+			for name, f := range funcs {
+				out := make([]byte, len(in))
+				f(out, in, i)
+				if !bytes.Equal(std, out) {
+					fmt.Printf("\nout :%s | %s\n", string(out), name)
+					fmt.Printf("need:%s | rot=%d\n", string(std), i)
+					return false
+				}
 			}
 		}
 	}
@@ -82,6 +95,7 @@ func benchmark() {
 
 func main() {
 	runtime.GOMAXPROCS(1)
+	//runAvx2()
 	run()
 	if !check() {
 		return

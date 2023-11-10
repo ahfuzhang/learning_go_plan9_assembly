@@ -8,7 +8,16 @@
 #include <avx2intrin.h>
 #include <assert.h>
 
-
+/*
+注意：如果编译参数中增加了 avx512 的选项，那么以下代码会被编译为尽可能的支持 avx512 指令集。
+    clang -o build/c test/main.c -O3 -g \
+	    -mavx -mavx2 \
+	    -mavx512f -mavx512vl -mavx512bw
+因此比较就失去了意义。
+需要在编译参数中隔离进行使用才行:
+    clang -o build/c test/main.c -O3 -g \
+	    -mavx -mavx2
+*/
 void caesar_crypt_avx2(SliceHeader* target, const SliceHeader* input, int rotate, const CaesarTable* table){
 	rotate %= 26;
     const uint32_t* line = (const uint32_t*)((*table)[rotate]);

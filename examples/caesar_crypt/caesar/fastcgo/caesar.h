@@ -22,6 +22,7 @@ void caesar_crypt(SliceHeader* out, const SliceHeader* in, int rotate, const Cae
     uint8_t* target = (uint8_t*)out->ptr;
     for (;src<end; src++, target++){
         *target = (uint8_t)line[*src];  // 直接查表得到结果
+        // 使用  O3 优化的时候，编译器会在这里循环展开 8 次
     }
 }
 
