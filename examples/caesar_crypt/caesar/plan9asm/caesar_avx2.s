@@ -42,6 +42,21 @@ align16:
         VPMOVZXBD X3, Y0  //  8 个 8bit, 变成 8 个  32 bit  // _mm256_cvtepu8_epi32
         VMOVDQA Y7, Y4  // Y4 = Y7 = 0
         BYTE $0xc4; BYTE $0xc2; BYTE $0x5d; BYTE $0x90; BYTE $0x0c; BYTE $0x84;  // VPGATHERDD %ymm4, (%r12,%ymm0,4), %ymm1;
+        /*
+            todo: 尝试别的写法
+            	"VGATHERDPD",   // VPGATHERDD
+                "VGATHERDPS",
+                "VGATHERPF0DPD",
+                "VGATHERPF0DPS",
+                "VGATHERPF0QPD",
+                "VGATHERPF0QPS",
+                "VGATHERPF1DPD",
+                "VGATHERPF1DPS",
+                "VGATHERPF1QPD",
+                "VGATHERPF1QPS",
+                "VGATHERQPD",
+                "VGATHERQPS",
+        */
         // 处理后面 8 字节
         MOVHLPS X3, X3
         VPMOVZXBD X3, Y0  // 8 个 8bit, 变成 8 个  32 bit  // _mm256_cvtepu8_epi32
