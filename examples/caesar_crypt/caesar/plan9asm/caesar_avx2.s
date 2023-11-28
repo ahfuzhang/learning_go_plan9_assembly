@@ -44,8 +44,8 @@ align16:
         BYTE $0xc4; BYTE $0xc2; BYTE $0x5d; BYTE $0x90; BYTE $0x0c; BYTE $0x84;  // VPGATHERDD %ymm4, (%r12,%ymm0,4), %ymm1;
         /*
             todo: 尝试别的写法
-            	"VGATHERDPD",   // VPGATHERDD
-                "VGATHERDPS",
+            	"VGATHERDPD",   // double
+                "VGATHERDPS",   // float32  // 32 位索引
                 "VGATHERPF0DPD",
                 "VGATHERPF0DPS",
                 "VGATHERPF0QPD",
@@ -54,8 +54,8 @@ align16:
                 "VGATHERPF1DPS",
                 "VGATHERPF1QPD",
                 "VGATHERPF1QPS",
-                "VGATHERQPD",
-                "VGATHERQPS",
+                "VGATHERQPD",  // 程序会根据向量寄存器中的索引值，从内存中的非连续地址加载双精度浮点数。
+                "VGATHERQPS",  // 64 位索引
         */
         // 处理后面 8 字节
         MOVHLPS X3, X3
