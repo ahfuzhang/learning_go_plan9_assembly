@@ -24,6 +24,7 @@ Collect various materials in the process of learning go plan9 assembly and share
 (Chinese)
 * [Go plan9 汇编笔记](notes/Go%20plan9%20汇编笔记.md)
   - 整理之中，很乱，还有很多错误
+* [Go plan9 汇编笔记](notes/Go%20plan9%20汇编笔记_arm64.md)
 
 说说我的感受：
 * 摩尔定律走到尽头，算法优化走入深水区
