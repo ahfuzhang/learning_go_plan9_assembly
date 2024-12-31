@@ -22,6 +22,12 @@ Collect various materials in the process of learning go plan9 assembly and share
 * ARM64
   * [move mask](examples/arm64/move_mask/README.md)
 
+# Awesome tools
+* goat
+  - https://github.com/gorse-io/goat
+  - Go assembly transpiler for C programming language
+  - `goat src/avx_mul_to.c -O3 -mavx -mfma -mavx512f -mavx512dq`
+
 # Notes
 (Chinese)
 * [Go plan9 汇编笔记](notes/Go%20plan9%20汇编笔记.md)
