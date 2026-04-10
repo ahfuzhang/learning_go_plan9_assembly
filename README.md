@@ -27,6 +27,8 @@ Collect various materials in the process of learning go plan9 assembly and share
 # Awesome tools
 * Compiler Explorer
   - https://godbolt.org/
+* lensm: A GUI tool to browse golang code and asm code.
+  - `go install loov.dev/lensm@main`
 * goat
   - https://github.com/gorse-io/goat
   - Go assembly transpiler for C programming language
